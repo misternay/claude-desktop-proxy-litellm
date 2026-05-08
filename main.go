@@ -19,6 +19,8 @@ import (
 	"syscall"
 	"time"
 	"unicode"
+
+	"gopkg.in/yaml.v3"
 )
 
 var idMap = map[string]string{
@@ -27,6 +29,35 @@ var idMap = map[string]string{
 	"claude-2-5-geminiflashlite-20240101": "gemini-2.5-flash-lite",
 	"claude-3-1-geminipro-20240101":       "gemini-3.1-pro",
 	"claude-3-0-geminiflash-20240101":     "gemini-3-flash",
+}
+
+// Config represents the YAML configuration
+type Config struct {
+	TargetURL string `yaml:"target_url"`
+	Port      int    `yaml:"port"`
+}
+
+// loadConfig reads the config.yaml file if it exists
+func loadConfig(path string) (*Config, error) {
+	// Set default values
+	config := &Config{
+		TargetURL: "",
+		Port:      8080,
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return config, nil // Return defaults if the file does not exist
+		}
+		return nil, fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	if err := yaml.Unmarshal(data, config); err != nil {
+		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	}
+
+	return config, nil
 }
 
 // UpstreamModelResponse maps the incoming JSON structure from the target server
@@ -271,9 +302,20 @@ func recoveryMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	port := flag.Int("port", 8080, "Port to listen on")
-	target := flag.String("target", "https://your-litellm-instance.com", "Target LiteLLM URL")
+	// 1. Load config file first to get default values
+	config, err := loadConfig("config.yaml")
+	if err != nil {
+		log.Fatalf("Error loading config.yaml: %v", err)
+	}
+
+	// 2. Setup flags using config values as defaults (so CLI arguments can override config)
+	port := flag.Int("port", config.Port, "Port to listen on (overrides config.yaml)")
+	target := flag.String("target", config.TargetURL, "Target LiteLLM URL (overrides config.yaml)")
 	flag.Parse()
+
+	if *target == "" {
+		log.Fatalf("Target URL is required. Please set it in config.yaml or pass it via --target flag.")
+	}
 
 	proxyServer, err := NewProxyServer(*target)
 	if err != nil {
