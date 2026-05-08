@@ -52,13 +52,6 @@ You can also pass arguments directly:
 ./proxy --port 8000 --target https://your-litellm-instance.com
 ```
 
-2. Point Claude Code to the proxy:
-
-```bash
-export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/
-claude cowork
-```
-
 ## Model Mappings
 
 The proxy automatically performs the following two-way mapping:
