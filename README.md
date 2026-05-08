@@ -52,6 +52,29 @@ You can also pass arguments directly:
 ./proxy --port 8000 --target https://your-litellm-instance.com
 ```
 
+### Claude Desktop Integration
+
+To connect the Claude Desktop application to this proxy, follow these steps to configure the inference gateway:
+
+![Claude Desktop Integration Config](https://github.com/user-attachments/assets/26ce19a1-cb92-4911-aa95-f9ad253818e6)
+
+1. Open Claude Desktop settings and navigate to **Connection**.
+2. Set the **Gateway base URL** to your proxy address (e.g., `http://127.0.0.1:8080/`). Note the trailing slash!
+3. Add your LiteLLM/OpenAI key in the **Gateway API key** field.
+4. Set the **Gateway auth scheme** to `bearer`.
+5. Under **Model list**, add the fake Claude aliases so they populate in the UI:
+   - `claude-3-1-geminipro-20240101`
+   - `claude-3-0-geminiflash-20240101`
+
+### Claude Code Integration
+
+Point Claude Code to the proxy via environment variable:
+
+```bash
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/
+claude cowork
+```
+
 ## Model Mappings
 
 The proxy automatically performs the following two-way mapping:
