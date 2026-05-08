@@ -56,7 +56,7 @@ You can also pass arguments directly:
 
 To connect the Claude Desktop application to this proxy, follow these steps to configure the inference gateway:
 
-![Claude Desktop Integration Config](https://github.com/user-attachments/assets/26ce19a1-cb92-4911-aa95-f9ad253818e6)
+![Claude Desktop Integration Config](assets/claude-desktop.png)
 
 1. Open Claude Desktop settings and navigate to **Connection**.
 2. Set the **Gateway base URL** to your proxy address (e.g., `http://127.0.0.1:8080/`). Note the trailing slash!
