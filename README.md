@@ -66,15 +66,6 @@ To connect the Claude Desktop application to this proxy, follow these steps to c
    - `claude-3-1-geminipro-20240101`
    - `claude-3-0-geminiflash-20240101`
 
-### Claude Code Integration
-
-Point Claude Code to the proxy via environment variable:
-
-```bash
-export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/
-claude cowork
-```
-
 ## Model Mappings
 
 The proxy automatically performs the following two-way mapping:
