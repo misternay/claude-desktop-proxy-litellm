@@ -24,37 +24,42 @@ import (
 )
 
 var idMap = map[string]string{
-	// Fake Claude aliases used by Claude Desktop (manually added to model list)
+	// ── Claude Desktop fake aliases (manually added to the model list in Claude Desktop) ──
+	// Current Gemini 4 / 3.x targets
+	"claude-4-0-gemini4argon-20240101":    "gemini-4-argon",
+	"claude-3-8-geminiflash-20240101":     "gemini-3.8-flash",
+	"claude-3-5-geminiflashlite-20240101": "gemini-3.5-flash-lite",
+	"claude-3-1-geminipro-20240101":       "gemini-3.1-pro-preview",
+	// Legacy aliases (kept for backward compatibility)
 	"claude-2-5-geminiflash-20240101":     "gemini-2.5-flash",
 	"claude-2-5-geminipro-20240101":       "gemini-2.5-pro",
 	"claude-2-5-geminiflashlite-20240101": "gemini-2.5-flash-lite",
-	"claude-3-1-geminipro-20240101":       "gemini-3.1-pro",
-	"claude-3-0-geminiflash-20240101":     "gemini-3-flash",
+	"claude-3-0-geminiflash-20240101":     "gemini-3.8-flash",
 
-	// Real Claude model names sent by Claude Code — mapped to Gemini equivalents.
-	// Claude Fable (reasoning/agentic) → gemini-2.5-pro
-	"claude-fable-5-1": "gemini-2.5-pro",
-	// Claude Opus → gemini-2.5-pro  (most capable)
-	"claude-opus-5-5":        "gemini-2.5-pro",
-	"claude-opus-4-8":        "gemini-2.5-pro",
-	"claude-opus-4-7":        "gemini-2.5-pro",
-	"claude-opus-4-6":        "gemini-2.5-pro",
-	"claude-opus-4-5":        "gemini-2.5-pro",
-	"claude-opus-4":          "gemini-2.5-pro",
-	"claude-3-opus-20240229": "gemini-2.5-pro",
-	// Claude Sonnet → gemini-2.5-flash  (balanced)
-	"claude-sonnet-5-5":          "gemini-2.5-flash",
-	"claude-sonnet-4-6":          "gemini-2.5-flash",
-	"claude-sonnet-4-5":          "gemini-2.5-flash",
-	"claude-sonnet-4":            "gemini-2.5-flash",
-	"claude-3-5-sonnet-20241022": "gemini-2.5-flash",
-	"claude-3-5-sonnet-20240620": "gemini-2.5-flash",
-	"claude-3-sonnet-20240229":   "gemini-2.5-flash",
-	// Claude Haiku → gemini-2.5-flash-lite  (lightweight/fast)
-	"claude-haiku-5-5":        "gemini-2.5-flash-lite",
-	"claude-haiku-4-5":        "gemini-2.5-flash-lite",
-	"claude-haiku-4":          "gemini-2.5-flash-lite",
-	"claude-3-haiku-20240307": "gemini-2.5-flash-lite",
+	// ── Real Claude model names sent by Claude Code — mapped to Gemini equivalents ──
+	// Claude Fable (reasoning/agentic, best) → gemini-4-argon
+	"claude-fable-5-1": "gemini-4-argon",
+	// Claude Opus (capable, agentic coding) → gemini-3.8-flash
+	"claude-opus-5-5":        "gemini-3.8-flash",
+	"claude-opus-4-8":        "gemini-3.8-flash",
+	"claude-opus-4-7":        "gemini-3.8-flash",
+	"claude-opus-4-6":        "gemini-3.8-flash",
+	"claude-opus-4-5":        "gemini-3.8-flash",
+	"claude-opus-4":          "gemini-3.8-flash",
+	"claude-3-opus-20240229": "gemini-3.8-flash",
+	// Claude Sonnet (balanced speed/intelligence) → gemini-3.8-flash
+	"claude-sonnet-5-5":          "gemini-3.8-flash",
+	"claude-sonnet-4-6":          "gemini-3.8-flash",
+	"claude-sonnet-4-5":          "gemini-3.8-flash",
+	"claude-sonnet-4":            "gemini-3.8-flash",
+	"claude-3-5-sonnet-20241022": "gemini-3.8-flash",
+	"claude-3-5-sonnet-20240620": "gemini-3.8-flash",
+	"claude-3-sonnet-20240229":   "gemini-3.8-flash",
+	// Claude Haiku (lightweight/fast) → gemini-3.5-flash-lite
+	"claude-haiku-5-5":        "gemini-3.5-flash-lite",
+	"claude-haiku-4-5":        "gemini-3.5-flash-lite",
+	"claude-haiku-4":          "gemini-3.5-flash-lite",
+	"claude-3-haiku-20240307": "gemini-3.5-flash-lite",
 }
 
 // Config represents the YAML configuration
@@ -273,16 +278,31 @@ func (ps *ProxyServer) errorHandler(w http.ResponseWriter, r *http.Request, err 
 
 func mapToClaudeID(originalID string) string {
 	switch {
+	// Gemini 4
+	case strings.Contains(originalID, "gemini-4-argon"):
+		return "claude-4-0-gemini4argon-20240101"
+	// Gemini 3.x Flash variants (order matters: check more specific strings first)
+	case strings.Contains(originalID, "gemini-3.8-flash-lite"):
+		return "claude-3-8-geminiflashlite-20240101"
+	case strings.Contains(originalID, "gemini-3.8-flash"):
+		return "claude-3-8-geminiflash-20240101"
+	case strings.Contains(originalID, "gemini-3.7-flash"):
+		return "claude-3-7-geminiflash-20240101"
+	case strings.Contains(originalID, "gemini-3.6-flash"):
+		return "claude-3-6-geminiflash-20240101"
+	case strings.Contains(originalID, "gemini-3.5-flash-lite"):
+		return "claude-3-5-geminiflashlite-20240101"
+	case strings.Contains(originalID, "gemini-3.5-flash"):
+		return "claude-3-5-geminiflash-20240101"
+	case strings.Contains(originalID, "gemini-3.1-pro"):
+		return "claude-3-1-geminipro-20240101"
+	// Gemini 2.5 (legacy)
 	case strings.Contains(originalID, "gemini-2.5-flash-lite"):
 		return "claude-2-5-geminiflashlite-20240101"
 	case strings.Contains(originalID, "gemini-2.5-flash"):
 		return "claude-2-5-geminiflash-20240101"
 	case strings.Contains(originalID, "gemini-2.5-pro"):
 		return "claude-2-5-geminipro-20240101"
-	case strings.Contains(originalID, "gemini-3.1-pro"):
-		return "claude-3-1-geminipro-20240101"
-	case strings.Contains(originalID, "gemini-3-flash"):
-		return "claude-3-0-geminiflash-20240101"
 	default:
 		return fmt.Sprintf("claude-3-0-%s-20240101", strings.ReplaceAll(originalID, "-", ""))
 	}

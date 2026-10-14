@@ -76,11 +76,10 @@ To connect the Claude Desktop application to this proxy, follow these steps to c
 3. Add your LiteLLM/OpenAI key in the **Gateway API key** field.
 4. Set the **Gateway auth scheme** to `bearer`.
 5. Under **Model list**, add the fake Claude aliases so they populate in the UI:
-   - `claude-2-5-geminipro-20240101`
-   - `claude-2-5-geminiflash-20240101`
-   - `claude-2-5-geminiflashlite-20240101`
-   - `claude-3-1-geminipro-20240101`
-   - `claude-3-0-geminiflash-20240101`
+   - `claude-4-0-gemini4argon-20240101` ← Gemini 4 Argon (flagship)
+   - `claude-3-8-geminiflash-20240101` ← Gemini 3.8 Flash (latest fast)
+   - `claude-3-5-geminiflashlite-20240101` ← Gemini 3.5 Flash-Lite (cheapest)
+   - `claude-3-1-geminipro-20240101` ← Gemini 3.1 Pro Preview
 
 ### Claude Code Integration
 
@@ -100,19 +99,20 @@ The proxy automatically maps model IDs in both directions. It handles two source
 
 | Claude UI ID | Upstream Gemini Model |
 | :--- | :--- |
-| `claude-2-5-geminiflash-20240101` | `gemini-2.5-flash` |
-| `claude-2-5-geminipro-20240101` | `gemini-2.5-pro` |
-| `claude-2-5-geminiflashlite-20240101` | `gemini-2.5-flash-lite` |
-| `claude-3-1-geminipro-20240101` | `gemini-3.1-pro` |
-| `claude-3-0-geminiflash-20240101` | `gemini-3-flash` |
+| `claude-4-0-gemini4argon-20240101` | `gemini-4-argon` |
+| `claude-3-8-geminiflash-20240101` | `gemini-3.8-flash` |
+| `claude-3-5-geminiflashlite-20240101` | `gemini-3.5-flash-lite` |
+| `claude-3-1-geminipro-20240101` | `gemini-3.1-pro-preview` |
+
+*Legacy aliases (`claude-2-5-*`) are kept for backward compatibility and still work.*
 
 ### Real Claude model names (sent automatically by Claude Code)
 
 | Claude Code Model | Upstream Gemini Model |
 | :--- | :--- |
-| `claude-fable-5-1` | `gemini-2.5-pro` |
-| `claude-opus-5-5`, `claude-opus-4-8`, `claude-opus-4-7`, `claude-opus-4-6`, `claude-opus-4-5`, `claude-opus-4`, `claude-3-opus-20240229` | `gemini-2.5-pro` |
-| `claude-sonnet-5-5`, `claude-sonnet-4-6`, `claude-sonnet-4-5`, `claude-sonnet-4`, `claude-3-5-sonnet-20241022`, `claude-3-5-sonnet-20240620`, `claude-3-sonnet-20240229` | `gemini-2.5-flash` |
-| `claude-haiku-5-5`, `claude-haiku-4-5`, `claude-haiku-4`, `claude-3-haiku-20240307` | `gemini-2.5-flash-lite` |
+| `claude-fable-5-1` | `gemini-4-argon` |
+| `claude-opus-5-5`, `claude-opus-4-8`, `claude-opus-4-7`, `claude-opus-4-6`, `claude-opus-4-5`, `claude-opus-4`, `claude-3-opus-20240229` | `gemini-3.8-flash` |
+| `claude-sonnet-5-5`, `claude-sonnet-4-6`, `claude-sonnet-4-5`, `claude-sonnet-4`, `claude-3-5-sonnet-20241022`, `claude-3-5-sonnet-20240620`, `claude-3-sonnet-20240229` | `gemini-3.8-flash` |
+| `claude-haiku-5-5`, `claude-haiku-4-5`, `claude-haiku-4`, `claude-3-haiku-20240307` | `gemini-3.5-flash-lite` |
 
 *Other unknown model IDs dynamically get a `claude-3-0-{id}-20240101` alias format.*
