@@ -24,11 +24,28 @@ import (
 )
 
 var idMap = map[string]string{
+	// Fake Claude aliases used by Claude Desktop (manually added to model list)
 	"claude-2-5-geminiflash-20240101":     "gemini-2.5-flash",
 	"claude-2-5-geminipro-20240101":       "gemini-2.5-pro",
 	"claude-2-5-geminiflashlite-20240101": "gemini-2.5-flash-lite",
 	"claude-3-1-geminipro-20240101":       "gemini-3.1-pro",
 	"claude-3-0-geminiflash-20240101":     "gemini-3-flash",
+
+	// Real Claude model names sent by Claude Code — mapped to Gemini equivalents
+	// claude-opus-* → gemini-2.5-pro  (most capable)
+	"claude-opus-4-5":        "gemini-2.5-pro",
+	"claude-opus-4":          "gemini-2.5-pro",
+	"claude-3-opus-20240229": "gemini-2.5-pro",
+	// claude-sonnet-* → gemini-2.5-flash  (balanced)
+	"claude-sonnet-4-5":            "gemini-2.5-flash",
+	"claude-sonnet-4":              "gemini-2.5-flash",
+	"claude-3-5-sonnet-20241022":   "gemini-2.5-flash",
+	"claude-3-5-sonnet-20240620":   "gemini-2.5-flash",
+	"claude-3-sonnet-20240229":     "gemini-2.5-flash",
+	// claude-haiku-* → gemini-2.5-flash-lite  (lightweight/fast)
+	"claude-haiku-4-5":        "gemini-2.5-flash-lite",
+	"claude-haiku-4":          "gemini-2.5-flash-lite",
+	"claude-3-haiku-20240307": "gemini-2.5-flash-lite",
 }
 
 // Config represents the YAML configuration
@@ -359,7 +376,13 @@ func main() {
 	if *insecure {
 		fmt.Printf("⚠️  TLS certificate verification is disabled\n")
 	}
-	fmt.Printf("\nSet Gateway base URL in Claude Desktop to: http://%s/\n", addr)
+	fmt.Printf("\n── Claude Desktop ──────────────────────────────────────\n")
+	fmt.Printf("Set Gateway base URL to: http://%s/\n", addr)
+	fmt.Printf("\n── Claude Code ─────────────────────────────────────────\n")
+	fmt.Printf("export ANTHROPIC_BASE_URL=http://%s/\n", addr)
+	fmt.Printf("export ANTHROPIC_API_KEY=<your-litellm-key>\n")
+	fmt.Printf("claude\n")
+	fmt.Printf("────────────────────────────────────────────────────────\n")
 	fmt.Printf("\nWaiting for requests...\n")
 
 	// Use log for runtime server information

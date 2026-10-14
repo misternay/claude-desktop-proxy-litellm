@@ -1,6 +1,6 @@
 # Claude Desktop Proxy for LiteLLM
 
-A high-performance reverse proxy written in Go that translates model IDs between [Claude Desktop](https://claude.ai/download) and [LiteLLM](https://github.com/BerriAI/litellm) (or any OpenAI-compatible endpoint).
+A high-performance reverse proxy written in Go that translates model IDs between [Claude Desktop](https://claude.ai/download) / [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) and [LiteLLM](https://github.com/BerriAI/litellm) (or any OpenAI-compatible endpoint).
 
 Specifically, this proxy intercepts requests and dynamically maps Anthropic's Claude model IDs to Google's Gemini model IDs, allowing you to seamlessly use Gemini models inside Claude's interfaces.
 
@@ -82,11 +82,23 @@ To connect the Claude Desktop application to this proxy, follow these steps to c
    - `claude-3-1-geminipro-20240101`
    - `claude-3-0-geminiflash-20240101`
 
+### Claude Code Integration
+
+Set two environment variables before running Claude Code — no custom model name needed, the proxy automatically maps Claude's default model names to Gemini equivalents:
+
+```bash
+export ANTHROPIC_BASE_URL=http://127.0.0.1:8080/
+export ANTHROPIC_API_KEY=<your-litellm-key>
+claude
+```
+
 ## Model Mappings
 
-The proxy automatically performs the following two-way mapping:
+The proxy automatically maps model IDs in both directions. It handles two sources of model names:
 
-| Claude UI ID (Fake) | Real Upstream Model ID (LiteLLM/Gemini) |
+### Claude Desktop aliases (manually added to the model list)
+
+| Claude UI ID | Upstream Gemini Model |
 | :--- | :--- |
 | `claude-2-5-geminiflash-20240101` | `gemini-2.5-flash` |
 | `claude-2-5-geminipro-20240101` | `gemini-2.5-pro` |
@@ -94,4 +106,12 @@ The proxy automatically performs the following two-way mapping:
 | `claude-3-1-geminipro-20240101` | `gemini-3.1-pro` |
 | `claude-3-0-geminiflash-20240101` | `gemini-3-flash` |
 
-*Other downstream models dynamically get a `claude-3-0-{id}-20240101` alias format.*
+### Real Claude model names (sent automatically by Claude Code)
+
+| Claude Code Model | Upstream Gemini Model |
+| :--- | :--- |
+| `claude-opus-4-5`, `claude-opus-4`, `claude-3-opus-20240229` | `gemini-2.5-pro` |
+| `claude-sonnet-4-5`, `claude-sonnet-4`, `claude-3-5-sonnet-20241022`, `claude-3-5-sonnet-20240620`, `claude-3-sonnet-20240229` | `gemini-2.5-flash` |
+| `claude-haiku-4-5`, `claude-haiku-4`, `claude-3-haiku-20240307` | `gemini-2.5-flash-lite` |
+
+*Other unknown model IDs dynamically get a `claude-3-0-{id}-20240101` alias format.*
