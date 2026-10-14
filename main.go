@@ -33,11 +33,12 @@ var idMap = map[string]string{
 
 // Config represents the YAML configuration
 type Config struct {
-	TargetURL string `yaml:"target_url"`
-	Port      int    `yaml:"port"`
+	TargetURL         string `yaml:"target_url"`
+	Port              int    `yaml:"port"`
+	InsecureSkipVerify bool  `yaml:"insecure_skip_verify"`
 }
 
-// loadConfig reads the config.yaml file if it exists
+// loadConfig reads the config.yaml file if it exists and applies environment variable overrides.
 func loadConfig(path string) (*Config, error) {
 	// Set default values
 	config := &Config{
@@ -48,6 +49,7 @@ func loadConfig(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
+			applyEnvOverrides(config)
 			return config, nil // Return defaults if the file does not exist
 		}
 		return nil, fmt.Errorf("failed to read config file: %w", err)
@@ -57,7 +59,21 @@ func loadConfig(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
+	// Environment variables override config file values
+	applyEnvOverrides(config)
+
 	return config, nil
+}
+
+func applyEnvOverrides(config *Config) {
+	if v := os.Getenv("PROXY_TARGET_URL"); v != "" {
+		config.TargetURL = v
+	}
+	if v := os.Getenv("PROXY_PORT"); v != "" {
+		if p, err := strconv.Atoi(v); err == nil {
+			config.Port = p
+		}
+	}
 }
 
 // UpstreamModelResponse maps the incoming JSON structure from the target server
@@ -88,7 +104,7 @@ type ProxyServer struct {
 }
 
 // NewProxyServer creates a configured ReverseProxy
-func NewProxyServer(target string) (*ProxyServer, error) {
+func NewProxyServer(target string, insecureSkipVerify bool) (*ProxyServer, error) {
 	targetURL, err := url.Parse(strings.TrimRight(target, "/"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid target URL: %w", err)
@@ -103,7 +119,7 @@ func NewProxyServer(target string) (*ProxyServer, error) {
 		ModifyResponse: ps.modifyResponse,
 		ErrorHandler:   ps.errorHandler,
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecureSkipVerify}, //nolint:gosec
 		},
 	}
 	ps.proxy = rp
@@ -302,22 +318,23 @@ func recoveryMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	// 1. Load config file first to get default values
+	// 1. Load config file first to get default values (env vars applied inside loadConfig)
 	config, err := loadConfig("config.yaml")
 	if err != nil {
 		log.Fatalf("Error loading config.yaml: %v", err)
 	}
 
-	// 2. Setup flags using config values as defaults (so CLI arguments can override config)
-	port := flag.Int("port", config.Port, "Port to listen on (overrides config.yaml)")
-	target := flag.String("target", config.TargetURL, "Target LiteLLM URL (overrides config.yaml)")
+	// 2. Setup flags using config values as defaults (CLI arguments take highest priority)
+	port := flag.Int("port", config.Port, "Port to listen on (overrides config.yaml / PROXY_PORT)")
+	target := flag.String("target", config.TargetURL, "Target LiteLLM URL (overrides config.yaml / PROXY_TARGET_URL)")
+	insecure := flag.Bool("insecure", config.InsecureSkipVerify, "Skip TLS certificate verification (overrides config.yaml insecure_skip_verify)")
 	flag.Parse()
 
 	if *target == "" {
-		log.Fatalf("Target URL is required. Please set it in config.yaml or pass it via --target flag.")
+		log.Fatalf("Target URL is required. Set it in config.yaml, via PROXY_TARGET_URL env var, or --target flag.")
 	}
 
-	proxyServer, err := NewProxyServer(*target)
+	proxyServer, err := NewProxyServer(*target, *insecure)
 	if err != nil {
 		log.Fatalf("Failed to initialize proxy: %v\n", err)
 	}
@@ -337,12 +354,12 @@ func main() {
 		IdleTimeout:       2 * time.Minute,
 	}
 
-	// Use fmt for static startup headers and instructions
-	fmt.Printf("🚀 Claude Code UI Proxy running at http://%s\n", addr)
+	fmt.Printf("🚀 Claude Desktop Proxy running at http://%s\n", addr)
 	fmt.Printf("📡 Forwarding traffic to: %s\n", proxyServer.targetURL.String())
-	fmt.Printf("\nTo use this with Claude Code, run:\n")
-	fmt.Printf("export ANTHROPIC_BASE_URL=http://%s/\n", addr)
-	fmt.Printf("claude cowork\n")
+	if *insecure {
+		fmt.Printf("⚠️  TLS certificate verification is disabled\n")
+	}
+	fmt.Printf("\nSet Gateway base URL in Claude Desktop to: http://%s/\n", addr)
 	fmt.Printf("\nWaiting for requests...\n")
 
 	// Use log for runtime server information

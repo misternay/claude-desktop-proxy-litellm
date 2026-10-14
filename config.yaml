@@ -1,2 +1,4 @@
 target_url: "https://your-litellm-instance.com"
 port: 8080
+# Set to true only if your LiteLLM instance uses a self-signed certificate
+insecure_skip_verify: false

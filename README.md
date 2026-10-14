@@ -1,6 +1,6 @@
 # Claude Desktop Proxy for LiteLLM
 
-A high-performance reverse proxy written in Go that translates model IDs between [Claude Desktop / Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) and [LiteLLM](https://github.com/BerriAI/litellm) (or any OpenAI-compatible endpoint). 
+A high-performance reverse proxy written in Go that translates model IDs between [Claude Desktop](https://claude.ai/download) and [LiteLLM](https://github.com/BerriAI/litellm) (or any OpenAI-compatible endpoint).
 
 Specifically, this proxy intercepts requests and dynamically maps Anthropic's Claude model IDs to Google's Gemini model IDs, allowing you to seamlessly use Gemini models inside Claude's interfaces.
 
@@ -10,7 +10,7 @@ Specifically, this proxy intercepts requests and dynamically maps Anthropic's Cl
 - **In-flight Translation**: Dynamically rewrites incoming `/v1/messages` request payloads to use Gemini IDs.
 - **Model Formatting**: Intercepts `/v1/models` responses to format and inject Claude-compatible aliases so they correctly populate in Claude's UI.
 - **Production-Ready**: Includes request logging, panic recovery middlewares, and graceful shutdown handling.
-- **Easy Configuration**: Uses a simple `config.yaml` file (with CLI flag overrides).
+- **Flexible Configuration**: `config.yaml` file, environment variables, and CLI flags — in increasing priority order.
 
 ## Prerequisites
 
@@ -35,9 +35,17 @@ Create a `config.yaml` file in the same directory as the executable (or use the 
 ```yaml
 target_url: "https://your-litellm-instance.com"
 port: 8080
+# Set to true only if your LiteLLM instance uses a self-signed certificate
+insecure_skip_verify: false
 ```
 
-*Note: You can override these values at runtime using command-line flags.*
+### Configuration priority (highest wins)
+
+| Source | Example |
+| :--- | :--- |
+| CLI flag | `--target`, `--port`, `--insecure` |
+| Environment variable | `PROXY_TARGET_URL`, `PROXY_PORT` |
+| `config.yaml` | `target_url`, `port`, `insecure_skip_verify` |
 
 ## Usage
 
@@ -52,6 +60,11 @@ You can also pass arguments directly:
 ./proxy --port 8000 --target https://your-litellm-instance.com
 ```
 
+Or use environment variables (useful for containers):
+```bash
+PROXY_TARGET_URL=https://your-litellm-instance.com PROXY_PORT=8080 ./proxy
+```
+
 ### Claude Desktop Integration
 
 To connect the Claude Desktop application to this proxy, follow these steps to configure the inference gateway:
@@ -63,6 +76,9 @@ To connect the Claude Desktop application to this proxy, follow these steps to c
 3. Add your LiteLLM/OpenAI key in the **Gateway API key** field.
 4. Set the **Gateway auth scheme** to `bearer`.
 5. Under **Model list**, add the fake Claude aliases so they populate in the UI:
+   - `claude-2-5-geminipro-20240101`
+   - `claude-2-5-geminiflash-20240101`
+   - `claude-2-5-geminiflashlite-20240101`
    - `claude-3-1-geminipro-20240101`
    - `claude-3-0-geminiflash-20240101`
 
