@@ -31,18 +31,27 @@ var idMap = map[string]string{
 	"claude-3-1-geminipro-20240101":       "gemini-3.1-pro",
 	"claude-3-0-geminiflash-20240101":     "gemini-3-flash",
 
-	// Real Claude model names sent by Claude Code — mapped to Gemini equivalents
-	// claude-opus-* → gemini-2.5-pro  (most capable)
+	// Real Claude model names sent by Claude Code — mapped to Gemini equivalents.
+	// Claude Fable (reasoning/agentic) → gemini-2.5-pro
+	"claude-fable-5-1": "gemini-2.5-pro",
+	// Claude Opus → gemini-2.5-pro  (most capable)
+	"claude-opus-5-5":        "gemini-2.5-pro",
+	"claude-opus-4-8":        "gemini-2.5-pro",
+	"claude-opus-4-7":        "gemini-2.5-pro",
+	"claude-opus-4-6":        "gemini-2.5-pro",
 	"claude-opus-4-5":        "gemini-2.5-pro",
 	"claude-opus-4":          "gemini-2.5-pro",
 	"claude-3-opus-20240229": "gemini-2.5-pro",
-	// claude-sonnet-* → gemini-2.5-flash  (balanced)
-	"claude-sonnet-4-5":            "gemini-2.5-flash",
-	"claude-sonnet-4":              "gemini-2.5-flash",
-	"claude-3-5-sonnet-20241022":   "gemini-2.5-flash",
-	"claude-3-5-sonnet-20240620":   "gemini-2.5-flash",
-	"claude-3-sonnet-20240229":     "gemini-2.5-flash",
-	// claude-haiku-* → gemini-2.5-flash-lite  (lightweight/fast)
+	// Claude Sonnet → gemini-2.5-flash  (balanced)
+	"claude-sonnet-5-5":          "gemini-2.5-flash",
+	"claude-sonnet-4-6":          "gemini-2.5-flash",
+	"claude-sonnet-4-5":          "gemini-2.5-flash",
+	"claude-sonnet-4":            "gemini-2.5-flash",
+	"claude-3-5-sonnet-20241022": "gemini-2.5-flash",
+	"claude-3-5-sonnet-20240620": "gemini-2.5-flash",
+	"claude-3-sonnet-20240229":   "gemini-2.5-flash",
+	// Claude Haiku → gemini-2.5-flash-lite  (lightweight/fast)
+	"claude-haiku-5-5":        "gemini-2.5-flash-lite",
 	"claude-haiku-4-5":        "gemini-2.5-flash-lite",
 	"claude-haiku-4":          "gemini-2.5-flash-lite",
 	"claude-3-haiku-20240307": "gemini-2.5-flash-lite",

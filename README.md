@@ -110,8 +110,9 @@ The proxy automatically maps model IDs in both directions. It handles two source
 
 | Claude Code Model | Upstream Gemini Model |
 | :--- | :--- |
-| `claude-opus-4-5`, `claude-opus-4`, `claude-3-opus-20240229` | `gemini-2.5-pro` |
-| `claude-sonnet-4-5`, `claude-sonnet-4`, `claude-3-5-sonnet-20241022`, `claude-3-5-sonnet-20240620`, `claude-3-sonnet-20240229` | `gemini-2.5-flash` |
-| `claude-haiku-4-5`, `claude-haiku-4`, `claude-3-haiku-20240307` | `gemini-2.5-flash-lite` |
+| `claude-fable-5-1` | `gemini-2.5-pro` |
+| `claude-opus-5-5`, `claude-opus-4-8`, `claude-opus-4-7`, `claude-opus-4-6`, `claude-opus-4-5`, `claude-opus-4`, `claude-3-opus-20240229` | `gemini-2.5-pro` |
+| `claude-sonnet-5-5`, `claude-sonnet-4-6`, `claude-sonnet-4-5`, `claude-sonnet-4`, `claude-3-5-sonnet-20241022`, `claude-3-5-sonnet-20240620`, `claude-3-sonnet-20240229` | `gemini-2.5-flash` |
+| `claude-haiku-5-5`, `claude-haiku-4-5`, `claude-haiku-4`, `claude-3-haiku-20240307` | `gemini-2.5-flash-lite` |
 
 *Other unknown model IDs dynamically get a `claude-3-0-{id}-20240101` alias format.*
